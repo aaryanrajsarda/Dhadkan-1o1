@@ -1,25 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { realdb, db, storage } from "./firebase";
 import { useStateValue } from "./StateProvider";
-
 import { onValue, ref as databaseReference } from "firebase/database";
-import { ref as storageReference, uploadBytes,getDownloadURL } from "firebase/storage";
-// import { collection, addDoc } from "firebase/firestore"; 
+import {
+  ref as storageReference,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
 import CircularSlider from "@fseehawer/react-circular-slider";
 import Button from "@mui/material/Button";
-// import {storage} from './firebase';
-import { getStorage} from "firebase/storage";
-// import reportUpload from './reportUpload';
-
-
-import {
-  collection,
-  collectionGroup,
-  doc,
-  setDoc,
-  addDoc,
-  onSnapshot,
-} from "firebase/firestore";
+import { collection, doc, addDoc, onSnapshot } from "firebase/firestore";
 import ReactPDF, {
   PDFDownloadLink,
   Document,
@@ -30,8 +20,6 @@ import ReactPDF, {
   Image,
 } from "@react-pdf/renderer";
 
-
-// console.log(storage);
 function GeneratePDF(temperature, spO2, pulseRate, details, user) {
   const styles = StyleSheet.create({
     image: {
@@ -90,19 +78,6 @@ function GeneratePDF(temperature, spO2, pulseRate, details, user) {
   );
 }
 
-// const uploadReport = (blob)=>{
-//   if(blob !== null){
-//     // setBlobFile(blob);
-//     console.log(blob);
-// //     const storage = getStorage();
-
-// // // Create a storage reference from our storage service
-// // const storageRef = ref(storage);
-    
-//   }
-  
-// }
-
 function Home() {
   const [pulseRate, setPulseRate] = useState(0);
   const [spO2, setSpO2] = useState(0);
@@ -110,7 +85,6 @@ function Home() {
   const [pdf, setPdf] = useState(null);
   const [details, setDetails] = useState(null);
   const [{ user }] = useStateValue();
-  const [blobFile, setBlobFile] = useState(null);
 
   useEffect(() => {
     onSnapshot(doc(db, "users", user?.uid), (doc) => {
@@ -132,7 +106,7 @@ function Home() {
         backgroundImage: `url("https://www.sleepfoundation.org/wp-content/uploads/2021/06/Physical-Health.jpg")`,
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
-        minHeight: "88vh"
+        minHeight: "88vh",
       }}
     >
       <div className="row pt-5 pb-5 text-center">
@@ -217,29 +191,22 @@ function Home() {
                       storage,
                       `reports/${user?.uid}/${new Date().toString()}`
                     );
-
-                    uploadBytes(storageRef, blobRes).then((snapshot) => {
+                    uploadBytes(storageRef, blobRes).then(() => {
                       console.log("Uploaded a blob or file!");
                       getDownloadURL(storageRef)
-  .then((url) => {
-    // `url` is the download URL for 'images/stars.jpg'
-      console.log(url);
-    // This can be downloaded directly:
-    const path = `users/${user?.uid}/reports`;
-      addDoc(collection(db,path),{
-        file : url,
-        name : new Date().toString()
-      })
-
-    // Or inserted into an <img> element
-    
-  })
-  .catch((error) => {
-    // Handle any errors
-  });
-
-
-
+                        .then((url) => {
+                          // `url` is the download URL for the report
+                          console.log(url);
+                          // This can be downloaded directly:
+                          const path = `users/${user?.uid}/reports`;
+                          addDoc(collection(db, path), {
+                            file: url,
+                            name: new Date().toString(),
+                          });
+                        })
+                        .catch((error) => {
+                          console.error("Error getting download url:", error);
+                        });
                     });
                     console.log(blobRes);
                   })
@@ -254,7 +221,6 @@ function Home() {
                 fileName={`report_${new Date().toString()}.pdf`}
                 style={{ color: "white", textDecoration: "none" }}
               >
-
                 {({ blob, url, loading, error }) => {
                   if (loading) {
                     return "Loading document...";
@@ -264,11 +230,9 @@ function Home() {
                     return "Generate Report";
                   }
                 }}
-
               </PDFDownloadLink>
             </Button>
           </div>
-          <reportUpload blob = {blobFile}/>
         </div>
       </div>
     </div>

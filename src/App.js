@@ -2,8 +2,8 @@ import "./App.css";
 import Home from "./Home";
 import Header from "./Header";
 import Profile from "./Profile";
-import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+import React from "react";
 import { useStateValue } from "./StateProvider";
 import Login from "./Login";
 
